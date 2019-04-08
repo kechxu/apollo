@@ -97,7 +97,7 @@ void InteractionPredictor::Predict(Obstacle* obstacle) {
     }
   }
 
-  double probability_threshold = 0.5;
+  double probability_threshold = 0.3;
   if (largest_posterior > probability_threshold) {
     for (int i = 0; i < num_lane_sequence; ++i) {
       const LaneSequence& lane_sequence =
