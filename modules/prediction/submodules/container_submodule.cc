@@ -76,6 +76,7 @@ bool ContainerSubmodule::Proc(
   const double frame_start_time = Clock::NowInSeconds();
   // Read localization info. and call OnLocalization to update
   // the PoseContainer.
+  AERROR << "Using container submodule";
   localization_reader_->Observe();
   auto ptr_localization_msg = localization_reader_->GetLatestObserved();
   if (ptr_localization_msg == nullptr) {

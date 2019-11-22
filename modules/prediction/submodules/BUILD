@@ -135,7 +135,7 @@ cc_binary(
 cc_library(
     name = "prediction_lego_lib",
     deps = [
-        ":container_submodule_lib",
+        "//modules/prediction:prediction_component_lib",
         ":evaluator_submodule_lib",
         ":predictor_submodule_lib",
     ],

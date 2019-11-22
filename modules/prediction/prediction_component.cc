@@ -88,26 +88,18 @@ bool PredictionComponent::Init() {
   prediction_writer_ =
       node_->CreateWriter<PredictionObstacles>(FLAGS_prediction_topic);
 
+  container_writer_ =
+      node_->CreateWriter<ContainerOutput>(FLAGS_container_topic_name);
+
+  adc_container_writer_ = node_->CreateWriter<ADCTrajectoryContainer>(
+      FLAGS_adccontainer_topic_name);
+
   return true;
 }
 
 bool PredictionComponent::Proc(
-    const std::shared_ptr<PerceptionObstacles>& perception_obstacles) {
-  if (FLAGS_prediction_test_mode &&
-      (Clock::NowInSeconds() - component_start_time_ >
-       FLAGS_prediction_test_duration)) {
-    ADEBUG << "Prediction finished running in test mode";
-  }
-
-  // Update relative map if needed
-  if (FLAGS_use_navigation_mode && !PredictionMap::Ready()) {
-    AERROR << "Relative map is empty.";
-    return false;
-  }
-
-  frame_start_time_ = Clock::NowInSeconds();
-  auto end_time1 = std::chrono::system_clock::now();
-
+    const std::shared_ptr<PerceptionObstacles>& perception_message) {
+  const double frame_start_time = Clock::NowInSeconds();
   // Read localization info. and call OnLocalization to update
   // the PoseContainer.
   localization_reader_->Observe();
@@ -118,10 +110,6 @@ bool PredictionComponent::Proc(
   }
   auto localization_msg = *ptr_localization_msg;
   MessageProcess::OnLocalization(localization_msg);
-  auto end_time2 = std::chrono::system_clock::now();
-  std::chrono::duration<double> diff = end_time2 - end_time1;
-  ADEBUG << "Time for updating PoseContainer: " << diff.count() * 1000
-         << " msec.";
 
   // Read planning info. of last frame and call OnPlanning to update
   // the ADCTrajectoryContainer
@@ -131,56 +119,28 @@ bool PredictionComponent::Proc(
     auto trajectory_msg = *ptr_trajectory_msg;
     MessageProcess::OnPlanning(trajectory_msg);
   }
-  auto end_time3 = std::chrono::system_clock::now();
-  diff = end_time3 - end_time2;
-  ADEBUG << "Time for updating ADCTrajectoryContainer: " << diff.count() * 1000
-         << " msec.";
+  MessageProcess::ContainerProcess(*perception_message);
 
-  // Get all perception_obstacles of this frame and call OnPerception to
-  // process them all.
-  auto perception_msg = *perception_obstacles;
-  PredictionObstacles prediction_obstacles;
-  MessageProcess::OnPerception(perception_msg, &prediction_obstacles);
-  auto end_time4 = std::chrono::system_clock::now();
-  diff = end_time4 - end_time3;
-  ADEBUG << "Time for updating PerceptionContainer: " << diff.count() * 1000
-         << " msec.";
+  auto obstacles_container_ptr =
+      ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
+          AdapterConfig::PERCEPTION_OBSTACLES);
+  CHECK_NOTNULL(obstacles_container_ptr);
 
-  // Postprocess prediction obstacles message
-  prediction_obstacles.set_start_timestamp(frame_start_time_);
-  prediction_obstacles.set_end_timestamp(Clock::NowInSeconds());
-  prediction_obstacles.mutable_header()->set_lidar_timestamp(
-      perception_msg.header().lidar_timestamp());
-  prediction_obstacles.mutable_header()->set_camera_timestamp(
-      perception_msg.header().camera_timestamp());
-  prediction_obstacles.mutable_header()->set_radar_timestamp(
-      perception_msg.header().radar_timestamp());
+  auto adc_trajectory_container_ptr =
+      ContainerManager::Instance()->GetContainer<ADCTrajectoryContainer>(
+          AdapterConfig::PLANNING_TRAJECTORY);
+  CHECK_NOTNULL(adc_trajectory_container_ptr);
 
-  prediction_obstacles.set_perception_error_code(perception_msg.error_code());
-
-  if (FLAGS_prediction_test_mode) {
-    for (auto const& prediction_obstacle :
-         prediction_obstacles.prediction_obstacle()) {
-      for (auto const& trajectory : prediction_obstacle.trajectory()) {
-        for (auto const& trajectory_point : trajectory.trajectory_point()) {
-          if (!ValidationChecker::ValidTrajectoryPoint(trajectory_point)) {
-            AERROR << "Invalid trajectory point ["
-                   << trajectory_point.ShortDebugString() << "]";
-            break;
-          }
-        }
-      }
-    }
-  }
-
-  auto end_time5 = std::chrono::system_clock::now();
-  diff = end_time5 - end_time1;
-  ADEBUG << "End to end time elapsed: " << diff.count() * 1000 << " msec.";
-
-  // Publish output
-  common::util::FillHeader(node_->Name(), &prediction_obstacles);
-  prediction_writer_->Write(
-      std::make_shared<PredictionObstacles>(prediction_obstacles));
+  SubmoduleOutput submodule_output =
+      obstacles_container_ptr->GetSubmoduleOutput();
+  submodule_output.set_perception_header(perception_message->header());
+  submodule_output.set_perception_error_code(perception_message->error_code());
+  submodule_output.set_frame_start_time(frame_start_time);
+  ContainerOutput container_output(std::move(submodule_output));
+  container_writer_->Write(std::make_shared<ContainerOutput>(container_output));
+  ADCTrajectoryContainer adc_container = *adc_trajectory_container_ptr;
+  adc_container_writer_->Write(
+      std::make_shared<ADCTrajectoryContainer>(adc_container));
   return true;
 }
 
