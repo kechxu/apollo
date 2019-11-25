@@ -4,7 +4,7 @@ module_config {
     components {
         class_name : "PredictionComponent"
         config {
-            name: "prediction_component"
+            name: "prediction"
             config_file_path: "/apollo/modules/prediction/conf/prediction_conf.pb.txt"
             flag_file_path: "/apollo/modules/prediction/conf/prediction.conf"
             readers: [
