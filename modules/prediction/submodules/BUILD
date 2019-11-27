@@ -24,6 +24,7 @@ cc_library(
         "//modules/prediction/proto:submodule_messages_proto",
         "//modules/storytelling/proto:story_proto",
     ],
+    alwayslink = True,
 )
 
 cc_library(
@@ -92,6 +93,7 @@ cc_library(
         "//modules/prediction/evaluator:evaluator_manager",
         "//modules/prediction/submodules:evaluator_output",
     ],
+    alwayslink = True,
 )
 
 cc_binary(
@@ -123,6 +125,7 @@ cc_library(
         "//modules/prediction/proto:prediction_proto",
         "//modules/prediction/submodules:evaluator_output",
     ],
+    alwayslink = True,
 )
 
 cc_binary(

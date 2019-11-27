@@ -35,6 +35,7 @@ std::string EvaluatorSubmodule::Name() const {
 }
 
 bool EvaluatorSubmodule::Init() {
+  AERROR << __FUNCTION__;
   if (!MessageProcess::InitEvaluators()) {
     return false;
   }
@@ -46,6 +47,7 @@ bool EvaluatorSubmodule::Init() {
 
 bool EvaluatorSubmodule::Proc(
     const std::shared_ptr<ContainerOutput>& container_output) {
+  AERROR << __FUNCTION__;
   const apollo::common::Header& perception_header =
       container_output->submodule_output().perception_header();
   const apollo::common::ErrorCode& perception_error_code =
