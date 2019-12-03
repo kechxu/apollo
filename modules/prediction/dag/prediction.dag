@@ -43,13 +43,13 @@ module_config {
             flag_file_path: "/apollo/modules/prediction/conf/prediction.conf"
             readers: [
                 {
-                    channel:"/apollo/prediction/evaluator"
+                    channel:"/apollo/prediction/adccontainer"
                     qos_profile: {
                         depth : 1
                     }
                 },
                 {
-                    channel:"/apollo/prediction/adccontainer"
+                    channel:"/apollo/prediction/evaluator"
                     qos_profile: {
                         depth : 1
                     }
