@@ -13,14 +13,8 @@ cc_library(
         "//modules/prediction/container:container_manager",
         "//modules/prediction/evaluator",
         "//modules/prediction/container/obstacles:obstacles_container",
-    ] + select({
-        "//tools/platforms:use_gpu": [
-            "@pytorch_gpu",
-        ],
-        "//conditions:default": [
-            "@pytorch",
-        ],
-    }),
+        "@pytorch_gpu",
+    ],
 )
 
 cc_test(
