@@ -104,7 +104,7 @@ void EvaluatorManager::RegisterEvaluators() {
   RegisterEvaluator(ObstacleConf::CYCLIST_KEEP_LANE_EVALUATOR);
   RegisterEvaluator(ObstacleConf::LANE_SCANNING_EVALUATOR);
   RegisterEvaluator(ObstacleConf::LANE_AGGREGATING_EVALUATOR);
-  RegisterEvaluator(ObstacleConf::PEDESTRIAN_INTERACTION_EVALUATOR);
+  // RegisterEvaluator(ObstacleConf::PEDESTRIAN_INTERACTION_EVALUATOR);
   RegisterEvaluator(ObstacleConf::JUNCTION_MAP_EVALUATOR);
   RegisterEvaluator(ObstacleConf::SEMANTIC_LSTM_EVALUATOR);
 }
