@@ -287,7 +287,9 @@ void EvaluatorManager::EvaluateObstacle(Obstacle* obstacle,
       if (FLAGS_prediction_offline_mode ==
               PredictionConstants::kDumpDataForLearning ||
           obstacle->latest_feature().priority().priority() ==
-              ObstaclePriority::CAUTION) {
+              ObstaclePriority::CAUTION ||
+          obstacle->latest_feature().priority().priority() ==
+              ObstaclePriority::NORMAL) {
         evaluator = GetEvaluator(pedestrian_evaluator_);
         CHECK_NOTNULL(evaluator);
         evaluator->Evaluate(obstacle, obstacles_container);
