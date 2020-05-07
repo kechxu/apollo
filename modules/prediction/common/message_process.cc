@@ -295,6 +295,7 @@ void MessageProcess::ProcessOfflineData(const std::string& record_filename) {
       writer.WriteMessage(RecordMessageToSingleMessage(message));
     }
     if (message.channel_name == FLAGS_perception_obstacle_topic) {
+      AERROR << FLAGS_perception_obstacle_topic;
       PerceptionObstacles perception_obstacles;
       if (perception_obstacles.ParseFromString(message.content)) {
         PredictionObstacles prediction_obstacles;

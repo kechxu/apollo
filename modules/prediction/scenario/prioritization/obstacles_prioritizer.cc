@@ -385,6 +385,10 @@ void ObstaclesPrioritizer::AssignCautionLevelByEgoReferenceLine(
     }
     double start_x = latest_feature_ptr->position().x();
     double start_y = latest_feature_ptr->position().y();
+    if (std::abs(start_x - ego_x) < 60.0 && std::abs(start_y - ego_y) < 60.0) {
+      latest_feature_ptr->mutable_priority()->set_priority(ObstaclePriority::CAUTION);
+    }
+    /*
     double end_x = start_x + FLAGS_caution_pedestrian_approach_time *
                                  latest_feature_ptr->raw_velocity().x();
     double end_y = start_y + FLAGS_caution_pedestrian_approach_time *
@@ -420,6 +424,7 @@ void ObstaclesPrioritizer::AssignCautionLevelByEgoReferenceLine(
         }
       }
     }
+    */
   }
 }
 

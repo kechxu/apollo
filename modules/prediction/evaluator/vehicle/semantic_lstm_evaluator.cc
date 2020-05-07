@@ -140,9 +140,9 @@ bool SemanticLSTMEvaluator::Evaluate(Obstacle* obstacle_ptr,
     TrajectoryPoint* point = trajectory->add_trajectory_point();
     double dx = static_cast<double>(torch_output[0][i][0]);
     double dy = static_cast<double>(torch_output[0][i][1]);
-    double sigma_xr = std::abs(static_cast<double>(torch_output[0][i][2]));
-    double sigma_yr = std::abs(static_cast<double>(torch_output[0][i][3]));
-    double corr_r = static_cast<double>(torch_output[0][i][4]);
+    // double sigma_xr = std::abs(static_cast<double>(torch_output[0][i][2]));
+    // double sigma_yr = std::abs(static_cast<double>(torch_output[0][i][3]));
+    // double corr_r = static_cast<double>(torch_output[0][i][4]);
     double heading = latest_feature_ptr->velocity_heading();
     Vec2d offset(dx, dy);
     Vec2d rotated_offset = offset.rotate(heading);
@@ -150,7 +150,7 @@ bool SemanticLSTMEvaluator::Evaluate(Obstacle* obstacle_ptr,
     double point_y = pos_y + rotated_offset.y();
     point->mutable_path_point()->set_x(point_x);
     point->mutable_path_point()->set_y(point_y);
-
+    /*
     Eigen::Matrix2d cov_matrix_r;
     cov_matrix_r(0, 0) = sigma_xr * sigma_xr;
     cov_matrix_r(0, 1) = corr_r * sigma_xr * sigma_yr;
@@ -187,6 +187,7 @@ bool SemanticLSTMEvaluator::Evaluate(Obstacle* obstacle_ptr,
       point->mutable_gaussian_info()->set_theta_a(
           std::atan2(sin_theta_a, cos_theta_a));
     }
+    */
 
     if (i < 10) {  // use origin heading for the first second
       point->mutable_path_point()->set_theta(
