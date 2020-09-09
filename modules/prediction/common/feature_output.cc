@@ -135,6 +135,8 @@ void FeatureOutput::InsertPredictionResult(
     prediction_result->add_trajectory()->CopyFrom(
         prediction_obstacle.trajectory(i));
     prediction_result->mutable_obstacle_conf()->CopyFrom(obstacle_conf);
+    prediction_result->mutable_obstacle_conf()->set_obstacle_type(
+        obstacle->type());
   }
   // Insert the scenario that the single obstacle is in
   if (scenario.type() == Scenario::JUNCTION &&
